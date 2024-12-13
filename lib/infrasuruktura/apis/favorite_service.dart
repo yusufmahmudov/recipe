@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class FavoriteService {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  Future<List<FavoriteModel>> fetchFavorite() async {
+  Future<List<int>> fetchFavorite() async {
     try {
       int userId = StorageRepository.getInt(StorageKeys.USERID);
 
@@ -15,8 +15,8 @@ class FavoriteService {
           .from(Tables.favorite.text)
           .select()
           .eq("user_id", userId);
-
-      return response.map((json) => FavoriteModel.fromJson(json)).toList();
+      return response.map((e) => e['product_id'] as int).toList();
+      // return response.map((json) => FavoriteModel.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
     }

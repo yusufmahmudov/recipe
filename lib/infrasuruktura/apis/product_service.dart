@@ -3,6 +3,7 @@ import 'package:recipe/data/model/g_model/product_model_g.dart';
 import 'package:recipe/data/model/ingredient_model.dart';
 import 'package:recipe/data/model/product_model.dart';
 import 'package:recipe/data/model/serves_model.dart';
+import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -141,6 +142,22 @@ class ProductService {
       await supabase.from("product").delete().eq('product', 3);
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
+
+  Future<List<ProductModel>> fetchProductFavorite() async {
+    try {
+      final List<int> productIds = await FavoriteService().fetchFavorite();
+      String ids = productIds.join(",");
+
+      final response = await supabase
+          .from(Tables.product.text)
+          .select()
+          .filter("id", "in", "($ids)");
+
+      return response.map((e) => ProductModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Xatolik yuz berdi $e");
     }
   }
 }

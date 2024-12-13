@@ -5,7 +5,6 @@ import 'package:recipe/data/model/product_model.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
 import 'package:recipe/presentation/views/home/product_view.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
-import 'package:recipe/utils/log_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -181,7 +180,6 @@ class _HomeViewState extends State<HomeView> {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
-              Log.d(snapshot.data?.length);
 
               return GridView.builder(
                 itemCount: snapshot.data?.length,

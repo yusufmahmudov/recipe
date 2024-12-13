@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/model/category_model.dart';
-import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/data/model/g_model/product_model_g.dart';
 import 'package:recipe/infrasuruktura/apis/category_service.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
 import 'package:recipe/presentation/views/add/add_category_view.dart';
@@ -146,7 +146,7 @@ class _AdderViewState extends State<AdderView> {
       );
     }
 
-    final ProductModel product = ProductModel(
+    final ProductModelG product = ProductModelG(
       name: controllerRecipe.text,
       portion: int.tryParse(controllerPortion.text) ?? 0,
       time: "${selHour.value} : ${selMinute.value}",

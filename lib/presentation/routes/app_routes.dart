@@ -14,7 +14,6 @@ import 'package:recipe/presentation/views/settings_view.dart';
 import 'package:recipe/presentation/views/splash_view.dart';
 import 'package:recipe/presentation/views/start_screen.dart';
 import 'package:recipe/presentation/views/support_view.dart';
-import 'package:recipe/utils/log_service.dart';
 
 sealed class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -55,7 +54,6 @@ sealed class AppRoutes {
       GoRoute(
         path: AppRouteName.info,
         builder: (context, state) {
-          Log.i(state.extra);
           return const InfoView();
         },
       ),

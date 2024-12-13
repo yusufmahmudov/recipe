@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:recipe/data/model/g_model/product_model_g.dart';
 import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
 
 part 'product_event.dart';
@@ -130,6 +131,62 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         } catch (e) {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
+    on<GetFavoriteProductEvent>(
+      (event, emit) async {
+        emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));
+        try {
+          final result = await ProductService().fetchProductFavorite();
+          emit(
+            state.copyWith(
+              statusFavorite: FormzSubmissionStatus.success,
+              favoriteProducts: result,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
+    on<AddFavoriteEvent>(
+      (event, emit) async {
+        emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));
+        try {
+          await FavoriteService().addFavorite(event.productId);
+          emit(
+            state.copyWith(
+              statusFavorite: FormzSubmissionStatus.success,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
+    on<DeleteFavoriteEvent>(
+      (event, emit) async {
+        emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));
+
+        try {
+          await FavoriteService().deleteFavorite(event.productId);
+          emit(
+            state.copyWith(
+              statusFavorite: FormzSubmissionStatus.success,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
           );
         }
       },
