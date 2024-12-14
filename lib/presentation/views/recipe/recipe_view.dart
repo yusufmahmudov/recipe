@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/dto/product_dto.dart';
-import 'package:recipe/presentation/views/add/adder_view.dart';
+import 'package:recipe/presentation/views/add/category_view.dart';
 import 'package:recipe/presentation/views/home/product_view.dart';
 import 'package:recipe/presentation/views/recipe/my_recipe_widget.dart';
 import 'package:recipe/presentation/widgets/w_tabbar.dart';
@@ -28,7 +28,7 @@ class _RecipeViewState extends State<RecipeView>
   void navigateToNewProductPage(BuildContext context) {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (context) => const AdderView(),
+        builder: (context) => const CategoryView(),
       ),
     );
   }

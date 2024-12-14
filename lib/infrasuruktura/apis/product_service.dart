@@ -6,6 +6,7 @@ import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
+import 'package:recipe/utils/log_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -62,6 +63,7 @@ class ProductService {
           .from(Tables.product.text)
           .insert(product.toJson())
           .select('id');
+      Log.i("product Id: ${productModel[0]['id']}");
       int productId = productModel[0]['id'];
       addIngredient(ingredients, productId);
       addPreparations(preparations, productId);
@@ -113,7 +115,7 @@ class ProductService {
           .cast<Map<String, dynamic>>()
           .toList();
 
-      await supabase.from(Tables.ingredient.text).insert(jsonList);
+      await supabase.from(Tables.serves.text).insert(jsonList);
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
     }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:recipe/assets/colors/colors.dart';
 // import 'package:recipe/infrastructure/core/context_extension.dart';
 
-
 class CommercialTab extends StatelessWidget {
   const CommercialTab({
     this.tabController,

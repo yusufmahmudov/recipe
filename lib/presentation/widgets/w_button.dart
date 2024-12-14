@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/presentation/widgets/w_scale_animation.dart';
 
-
 class WButton extends StatelessWidget {
   final double? width;
   final double? height;

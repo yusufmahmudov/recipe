@@ -87,6 +87,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
               statusProduct: FormzSubmissionStatus.success,
             ),
           );
+          add(GetProductsEvent());
         } catch (e) {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:recipe/assets/colors/colors.dart';
 
-
 class WTextField extends StatefulWidget {
   final TextEditingController? controller;
   final ValueChanged<String> onChanged;

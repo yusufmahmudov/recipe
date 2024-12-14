@@ -5,7 +5,9 @@ import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
 
 class ServesView extends StatefulWidget {
-  const ServesView({super.key});
+   final List<Map<String, String>> preparations;
+
+  const ServesView({super.key, required this.preparations});
 
   @override
   State<ServesView> createState() => _ServesViewState();
@@ -15,13 +17,12 @@ class _ServesViewState extends State<ServesView> {
   final TextEditingController controllerProcessName = TextEditingController();
   final TextEditingController controllerProcess = TextEditingController();
 
-  List<Map<String, String>> preparations = [];
 
   void _addPreparation() {
     if (controllerProcessName.text.isNotEmpty &&
         controllerProcess.text.isNotEmpty) {
       setState(() {
-        preparations.add({
+        widget.preparations.add({
           'name': controllerProcessName.text,
           'process': controllerProcess.text,
         });
@@ -33,7 +34,7 @@ class _ServesViewState extends State<ServesView> {
 
   void _removePreparation(int index) {
     setState(() {
-      preparations.removeAt(index);
+      widget.preparations.removeAt(index);
     });
   }
 
@@ -60,7 +61,22 @@ class _ServesViewState extends State<ServesView> {
           margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           text: "Saqlash",
           onTap: () {
-            Navigator.pop(context, preparations);
+            if (controllerProcessName.text.isNotEmpty &&
+                controllerProcess.text.isNotEmpty) {
+              setState(
+                () {
+                  widget.preparations.add(
+                    {
+                      'name': controllerProcessName.text,
+                      'process': controllerProcess.text,
+                    },
+                  );
+                  controllerProcessName.clear();
+                  controllerProcess.clear();
+                },
+              );
+            }
+            Navigator.pop(context, widget.preparations);
           },
         ),
       ),
@@ -75,9 +91,9 @@ class _ServesViewState extends State<ServesView> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: preparations.length + 1,
+                itemCount: widget.preparations.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == preparations.length) {
+                  if (index == widget.preparations.length) {
                     return _buildAddNewPreparationRow();
                   }
                   return _buildPreparationRow(index);
@@ -119,7 +135,7 @@ class _ServesViewState extends State<ServesView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "${preparations.length + 1}-jarayon",
+                "${widget.preparations.length + 1}-jarayon",
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
@@ -170,7 +186,7 @@ class _ServesViewState extends State<ServesView> {
           ),
           CustomTextField(
             readOnly: true,
-            hintText: preparations[index]['name']!,
+            hintText: widget.preparations[index]['name']!,
             borderColor: greyBack.withOpacity(.8),
           ),
           const SizedBox(height: 8),
@@ -180,7 +196,7 @@ class _ServesViewState extends State<ServesView> {
             noHeight: true,
             minLines: 3,
             readOnly: true,
-            hintText: preparations[index]['process']!,
+            hintText: widget.preparations[index]['process']!,
             borderColor: greyBack.withOpacity(.8),
           ),
         ],

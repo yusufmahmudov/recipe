@@ -17,7 +17,7 @@ class WScaleAnimation extends StatefulWidget {
     this.isDisabled = false,
     this.duration = const Duration(milliseconds: 150),
     this.scaleValue = 0.95,
-  })  : assert(scaleValue <= 1 && scaleValue >= 0,
+  }) : assert(scaleValue <= 1 && scaleValue >= 0,
             'Range error: Range should be between [0,1]');
 
   @override

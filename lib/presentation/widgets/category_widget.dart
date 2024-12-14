@@ -1,56 +1,69 @@
-// import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:recipe/assets/colors/colors.dart';
+import 'package:recipe/assets/icons.dart';
+import 'package:recipe/data/model/category_model.dart';
+import 'package:recipe/presentation/views/add/add_category_view.dart';
+import 'package:recipe/presentation/views/add/add_product_view.dart';
 
-// class CategoryWidget extends StatefulWidget {
-//   const  @override
-//   State<CategoryWidget> createState() => _CategoryWidgetState();
-// }
+class CategoryWidget extends StatelessWidget {
+  final CategoryModel category;
+  const CategoryWidget({super.key, required this.category});
 
-// class _CategoryWidgetState extends State<CategoryWidget> {
-//  CategoryWidget({
-//     super.key,
-//     required this.categories,
-//     required this.selIndex,
-//   });
-//   final List<String> categories;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (category.id == -1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddCategoryView(),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddProductView(categoryId: category.id!),
+            ),
+          );
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              redOrange,
+              redOrange,
+              redOrange20,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: SizedBox(
+            height: 70,
+            child: Row(
+              children: [
+                selectIcon(),
+                const SizedBox(width: 8),
+                Text(
+                  "${category.name}",
+                  style: const TextStyle(color: white, fontSize: 24),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-//   final ValueNotifier<int> selIndex;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.separated(
-//       padding: const EdgeInsets.symmetric(horizontal: 16),
-//       scrollDirection: Axis.horizontal,
-//       separatorBuilder: (context, index) =>
-//           const SizedBox(width: 16),
-//       itemCount: categories.length,
-//       itemBuilder: (context, index) => GestureDetector(
-//         onTap: () => selIndex.value = index,
-//         child: Container(
-//           padding: const EdgeInsets.symmetric(horizontal: 16),
-//           height: 34,
-//           decoration: BoxDecoration(
-//             color:
-//                 value == index ? redOrange : Colors.transparent,
-//             border: value == index
-//                 ? Border.all(color: redOrange)
-//                 : null,
-//             borderRadius: BorderRadius.circular(10),
-//           ),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Text(
-//                 categories[index],
-//                 style: TextStyle(
-//                   fontSize: 18,
-//                   fontWeight: FontWeight.w700,
-//                   color: value == index ? white : redOrange20,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  SvgPicture selectIcon() {
+    return AppIcons.recipe.svg(width: 32, height: 32, color: white);
+  }
+}

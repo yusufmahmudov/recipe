@@ -2,60 +2,42 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 // ignore: depend_on_referenced_packages
 import 'package:image_picker/image_picker.dart';
+import 'package:recipe/application/product/product_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
+import 'package:recipe/assets/constants/storage_keys.dart';
 import 'package:recipe/data/model/category_model.dart';
 import 'package:recipe/data/model/g_model/product_model_g.dart';
 import 'package:recipe/infrasuruktura/apis/category_service.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
-import 'package:recipe/presentation/views/add/add_category_view.dart';
+import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/presentation/views/add/serves_view.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
+import 'package:recipe/utils/custom_toast_bar.dart';
 
-class AdderView extends StatefulWidget {
-  const AdderView({super.key});
+class AddProductView extends StatefulWidget {
+  final int categoryId;
+  const AddProductView({super.key, required this.categoryId});
 
   @override
-  State<AdderView> createState() => _AdderViewState();
+  State<AddProductView> createState() => _AddProductViewState();
 }
 
-class _AdderViewState extends State<AdderView> {
+class _AddProductViewState extends State<AddProductView> {
   late TextEditingController controllerRecipe;
   late TextEditingController controllerPortion;
   final TextEditingController controllerItemName = TextEditingController();
   final TextEditingController controllerQuantity = TextEditingController();
-  late TextEditingController controllerCategory;
   late ValueNotifier<int> selHour;
   late ValueNotifier<int> selMinute;
   final ProductService productService = ProductService();
   final CategoryService categoryService = CategoryService();
   List<CategoryModel> categoryes = [];
   List<Map<String, String>> preparations = [];
-
-  static const menuItems = <String>[
-    'one',
-    'two',
-    'three',
-    'four',
-  ];
-
-  final List<DropdownMenuItem<String>> _dropDownMenuItem = menuItems
-      .map(
-        (String value) => DropdownMenuItem<String>(
-          value: value,
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      )
-      .toList();
-
   List<Map<String, String>> ingredients = [];
   String? categorySelectedVal;
   final ImagePicker _picker = ImagePicker();
@@ -65,7 +47,6 @@ class _AdderViewState extends State<AdderView> {
   void initState() {
     controllerRecipe = TextEditingController();
     controllerPortion = TextEditingController();
-    controllerCategory = TextEditingController();
     selHour = ValueNotifier(0);
     selMinute = ValueNotifier(0);
     super.initState();
@@ -111,10 +92,9 @@ class _AdderViewState extends State<AdderView> {
     final List<Map<String, String>> preparationSteps = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ServesView(),
+        builder: (context) => ServesView(preparations: preparations),
       ),
     );
-
     // ignore: unnecessary_null_comparison
     if (preparationSteps != null) {
       setState(() {
@@ -123,88 +103,108 @@ class _AdderViewState extends State<AdderView> {
     }
   }
 
-  void navigateToCategoryPage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const AddCategoryView(),
-      ),
-    );
-  }
-
-  Future<void> getAllCategory() async {
-    categoryes = await categoryService.fetchCategoryes();
-  }
-
-  Future<void> _submitForm() async {
-    if (controllerItemName.text.isNotEmpty &&
-        controllerQuantity.text.isNotEmpty) {
-      ingredients.add(
-        {
-          'name': controllerItemName.text,
-          'quantity': controllerQuantity.text,
-        },
-      );
-    }
-
-    final ProductModelG product = ProductModelG(
-      name: controllerRecipe.text,
-      portion: int.tryParse(controllerPortion.text) ?? 0,
-      time: "${selHour.value} : ${selMinute.value}",
-      categoryId: 1,
-    );
-
-    await productService.addProduct(product, ingredients, preparations);
-
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
+  String timeSetup() {
+    return "${selHour.value}:${selMinute.value < 10 ? '0' : ''}${selMinute.value}";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Yangi retsept',
-            style: TextStyle(fontSize: 24),
+        backgroundColor: redOrange,
+        title: const Text(
+          'Yangi retsept',
+          style: TextStyle(
+            fontSize: 24,
+            color: white,
           ),
         ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
             size: 28,
+            color: white,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          PopupMenuButton(
-            iconSize: 24,
-            icon: const Icon(
-              Icons.more_vert,
-              size: 28,
-            ),
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  child: const Text("Kategoriya qo'shish"),
-                  onTap: () {
-                    navigateToCategoryPage(context);
-                  },
-                ),
-                const PopupMenuItem(child: Text("Delete")),
-              ];
-            },
-          ),
-        ],
       ),
       bottomNavigationBar: SafeArea(
-        child: WButton(
-          color: redOrange,
-          height: 54,
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          text: "Saqlash",
-          onTap: () {
-            _submitForm();
+        child: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            return WButton(
+              color: redOrange,
+              height: 54,
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              text: "Saqlash",
+              onTap: () {
+                if (controllerItemName.text.isNotEmpty &&
+                    controllerQuantity.text.isNotEmpty) {
+                  setState(
+                    () {
+                      ingredients.add(
+                        {
+                          'name': controllerItemName.text,
+                          'quantity': controllerQuantity.text,
+                        },
+                      );
+                      controllerItemName.clear();
+                      controllerQuantity.clear();
+                    },
+                  );
+                }
+                if (controllerRecipe.text.isEmpty) {
+                  showCustomToast(
+                      context: context,
+                      message: "Retsept nomi bo'sh bo'lmasligi kerak!");
+                } else if (controllerPortion.text.isEmpty) {
+                  showCustomToast(
+                      context: context,
+                      message: "Retsept portsiyasini kiriting!");
+                } else if (ingredients.isEmpty) {
+                  showCustomToast(
+                      context: context,
+                      message: "Mahsulotlar ro'yxatini kiriting!");
+                } else if (preparations.isEmpty) {
+                  showCustomToast(
+                      context: context,
+                      message: "Tayyorlash jarayonlarini yozishingiz kerak");
+                } else {
+                  String time = timeSetup();
+                  int userId = StorageRepository.getInt(StorageKeys.USERID);
+
+                  final ProductModelG product = ProductModelG(
+                    name: controllerRecipe.text,
+                    portion: int.tryParse(controllerPortion.text) ?? 0,
+                    time: time,
+                    categoryId: widget.categoryId,
+                    userId: userId,
+                  );
+
+                  context.read<ProductBloc>().add(
+                        AddProductEvent(
+                          productG: product,
+                          ingredients: ingredients,
+                          preparations: preparations,
+                        ),
+                      );
+
+                  if (state.statusProduct.isFailure) {
+                    showCustomToast(
+                        context: context,
+                        message: "Nimadir xato ketdi, Retsept saqlanmadi!");
+                  } else if (state.statusProduct.isSuccess) {
+                    showCustomToast(
+                      context: context,
+                      message: "Retsept saqlandi",
+                      color: green,
+                    );
+                  }
+                }
+                Navigator.pop(context);
+              },
+            );
           },
         ),
       ),
@@ -254,59 +254,12 @@ class _AdderViewState extends State<AdderView> {
               hintText: "Retsept nomi",
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: DropdownButtonFormField<String>(
-                      items: _dropDownMenuItem,
-                      value: categorySelectedVal,
-                      hint: const Text(
-                        "Kategoriya",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            categorySelectedVal = newValue;
-                          });
-                        }
-                      },
-                      decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: redOrange),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: redOrange),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: redOrange),
-                        ),
-                      ),
-                      icon: const Icon(Icons.arrow_drop_down),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomTextField(
-                    // onChanged: () {},
-                    borderColor: redOrange,
-                    controller: controllerPortion,
-                    hintText: "Retsept portsiyasi",
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
+            CustomTextField(
+              // onChanged: () {},
+              borderColor: redOrange,
+              controller: controllerPortion,
+              hintText: "Retsept portsiyasi",
+              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             GestureDetector(
