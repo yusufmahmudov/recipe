@@ -9,7 +9,7 @@ import 'package:recipe/presentation/views/notification/notification_view.dart';
 import 'package:recipe/presentation/views/profile/login_view.dart';
 import 'package:recipe/presentation/views/profile/profile_view.dart';
 import 'package:recipe/presentation/views/profile/register_view.dart';
-import 'package:recipe/presentation/views/recipe/recipe_view.dart';
+import 'package:recipe/presentation/views/recipe/favorite_recipe_view.dart';
 import 'package:recipe/presentation/views/settings_view.dart';
 import 'package:recipe/presentation/views/splash_view.dart';
 import 'package:recipe/presentation/views/start_screen.dart';
@@ -47,10 +47,6 @@ sealed class AppRoutes {
         path: AppRouteName.settings,
         builder: (context, state) => const SettingsView(),
       ),
-      // GoRoute(
-      //   path: AppRouteName.add,
-      //   builder: (context, state) => const AdderView(),
-      // ),
       GoRoute(
         path: AppRouteName.info,
         builder: (context, state) {
@@ -81,8 +77,8 @@ sealed class AppRoutes {
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: AppRouteName.recipe,
-            builder: (context, state) => const RecipeView(),
+            path: AppRouteName.favorite,
+            builder: (context, state) => const FavoriteRecipeView(),
           ),
         ],
       ),

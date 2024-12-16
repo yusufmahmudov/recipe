@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
@@ -81,6 +83,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
             event.productG,
             event.ingredients,
             event.preparations,
+            event.image,
           );
           emit(
             state.copyWith(

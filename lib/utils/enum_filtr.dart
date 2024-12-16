@@ -38,11 +38,13 @@ enum Tables {
   serves,
   ingredient,
   role,
+  images,
   favorite;
 
   String get text => switch (this) {
         Tables.user => 'users',
         Tables.favorite => 'favorite',
+        Tables.images => 'images',
         Tables.category => 'category',
         Tables.ingredient => 'ingredient',
         Tables.serves => 'serves',

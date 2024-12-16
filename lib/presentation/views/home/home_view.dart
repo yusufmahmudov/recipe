@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
+import 'package:recipe/application/category/category_bloc.dart';
+import 'package:recipe/application/product/product_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/model/product_model.dart';
-import 'package:recipe/infrasuruktura/apis/product_service.dart';
 import 'package:recipe/presentation/views/home/product_view.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
 
@@ -15,94 +18,20 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   ValueNotifier<int> selIndex = ValueNotifier(0);
-  final List<String> categories = [
-    "Salad",
-    "Breakfast",
-    "Appetizer",
-    "Noodle",
-    "Salad",
-    "Breakfast",
-    "Appetizer",
-    "Noodle",
-  ];
 
-  final List<Map<String, dynamic>> products = [
-    {
-      "name": "Burger manti xonim",
-      "time": "40 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Peper non kabob rapmen",
-      "time": "20 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-    {
-      "name": "Pepper sweetcorn ramen",
-      "time": "10 Mins",
-      "image": "assets/ramen.png",
-      "isSelected": false,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    context.read<CategoryBloc>().add(GetCategoryEvent());
+    context
+        .read<ProductBloc>()
+        .add(GetProductsByCategoryEvent(categoryId: selIndex.value));
+  }
 
-  final List<ProductModel> product = [];
-
-  // final List<Map<String, dynamic>> selectedProduct = [];
-
-  void navigateToProductPage(BuildContext context) {
+  void navigateToProductPage(BuildContext context, ProductModel product) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const ProductView(),
+        builder: (context) => ProductView(product: product),
       ),
     );
   }
@@ -111,6 +40,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: white,
         appBar: AppBar(
           title: const CustomTextField(
             textAlign: TextAlign.start,
@@ -134,55 +64,93 @@ class _HomeViewState extends State<HomeView> {
                 child: ValueListenableBuilder(
                   valueListenable: selIndex,
                   builder: (context, value, child) {
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 16),
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () => selIndex.value = index,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color:
-                                value == index ? redOrange : Colors.transparent,
-                            border: value == index
-                                ? Border.all(color: redOrange)
-                                : null,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                categories[index],
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: value == index ? white : redOrange20,
-                                ),
+                    return BlocBuilder<CategoryBloc, CategoryState>(
+                      builder: (context, state) {
+                        if (state.statusCategory.isInProgress) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.red,
+                              strokeWidth: 4.0,
+                            ),
+                          );
+                        } else if (state.categoryes.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "Category ro'yxati bo'sh",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500,
                               ),
-                            ],
+                            ),
+                          );
+                        }
+                        return ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 16),
+                          itemCount: state.categoryes.length,
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () => selIndex.value = index,
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: value == index
+                                    ? redOrange
+                                    : Colors.transparent,
+                                border: value == index
+                                    ? Border.all(color: redOrange)
+                                    : null,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    state.categoryes[index].name!,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color:
+                                          value == index ? white : redOrange20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
                 ),
               ),
             ),
           ],
-          body: FutureBuilder(
-            future: ProductService().fetchProducts(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
+          body: BlocBuilder<ProductBloc, ProductState>(
+            builder: (context, state) {
+              if (state.statusProduct.isInProgress) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
+                    strokeWidth: 4.0,
+                  ),
+                );
+              } else if (state.products.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Retseptlar ro'yxati bo'sh",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
               }
-
               return GridView.builder(
-                itemCount: snapshot.data?.length,
+                itemCount: state.products.length,
                 padding: const EdgeInsets.all(16),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -192,9 +160,9 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 itemBuilder: (context, index) {
                   // ignore: collection_methods_unrelated_type
-                  final product = snapshot.data![index];
+                  final product = state.products[index];
                   return GestureDetector(
-                    onTap: () => navigateToProductPage(context),
+                    onTap: () => navigateToProductPage(context, product),
                     child: Stack(
                       alignment: Alignment.topCenter,
                       children: [
@@ -229,7 +197,7 @@ class _HomeViewState extends State<HomeView> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         const Text(
-                                          "Time",
+                                          "Vaqt",
                                           style: TextStyle(color: gray),
                                         ),
                                         Text(

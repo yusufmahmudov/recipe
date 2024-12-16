@@ -16,11 +16,13 @@ class AddProductEvent extends ProductEvent {
   final ProductModelG productG;
   final List<Map<String, String>> ingredients;
   final List<Map<String, String>> preparations;
+  final File? image;
 
   AddProductEvent({
     required this.productG,
     required this.ingredients,
     required this.preparations,
+    required this.image,
   });
 }
 

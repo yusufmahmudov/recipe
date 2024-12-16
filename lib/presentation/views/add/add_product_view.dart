@@ -187,6 +187,7 @@ class _AddProductViewState extends State<AddProductView> {
                           productG: product,
                           ingredients: ingredients,
                           preparations: preparations,
+                          image: _image,
                         ),
                       );
 

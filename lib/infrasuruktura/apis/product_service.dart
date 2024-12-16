@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:recipe/assets/constants/storage_keys.dart';
 import 'package:recipe/data/model/g_model/product_model_g.dart';
 import 'package:recipe/data/model/ingredient_model.dart';
@@ -6,7 +8,6 @@ import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
-import 'package:recipe/utils/log_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -55,18 +56,29 @@ class ProductService {
 
   // Yangi mahsulot qo'shish
   Future<void> addProduct(
-      ProductModelG product,
-      List<Map<String, String>> ingredients,
-      List<Map<String, String>> preparations) async {
+    ProductModelG product,
+    List<Map<String, String>> ingredients,
+    List<Map<String, String>> preparations,
+    File? image,
+  ) async {
     try {
       final productModel = await supabase
           .from(Tables.product.text)
           .insert(product.toJson())
           .select('id');
-      Log.i("product Id: ${productModel[0]['id']}");
+
       int productId = productModel[0]['id'];
       addIngredient(ingredients, productId);
       addPreparations(preparations, productId);
+
+      ProductModel productModelC = productModel
+          .map((json) => ProductModel.fromJson(json))
+          .toList()
+          .first;
+          
+      if (image != null) {
+        uploadProductImage(image, productModelC);
+      }
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
     }
@@ -118,6 +130,33 @@ class ProductService {
       await supabase.from(Tables.serves.text).insert(jsonList);
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
+
+  Future<void> uploadProductImage(File imageFile, ProductModel product) async {
+    try {
+      final String filePath =
+          'products/${DateTime.now().toIso8601String()}_${imageFile.uri.pathSegments.last}';
+
+      // Faylni yuklash
+      await supabase.storage.from(Tables.images.text).upload(
+            filePath,
+            imageFile,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      // Public URL olish
+      final String publicUrl =
+          supabase.storage.from(Tables.images.text).getPublicUrl(filePath);
+
+      product.imageUrl = publicUrl;
+
+      await supabase
+          .from('product')
+          .update(product.toJson() as Map)
+          .eq('id', product.id!);
+    } catch (e) {
+      throw Exception("Xatolik uploadProductImage $e");
     }
   }
 

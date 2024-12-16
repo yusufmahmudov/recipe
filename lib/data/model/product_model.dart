@@ -16,6 +16,7 @@ class ProductModel {
   final String? time;
   final int? categoryId;
   final int? userId;
+  String? imageUrl;
 
   ProductModel({
     this.id,
@@ -24,6 +25,7 @@ class ProductModel {
     this.time,
     this.categoryId,
     this.userId,
+    this.imageUrl,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
@@ -33,6 +35,7 @@ class ProductModel {
         time: json["time"],
         categoryId: json["category_id"],
         userId: json["user_id"],
+        imageUrl: json["image_url"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -42,5 +45,6 @@ class ProductModel {
         "time": time,
         "category_id": categoryId,
         "user_id": userId,
+        "image_url": imageUrl,
       };
 }

@@ -11,7 +11,7 @@ abstract class AppRouteName {
   static const login = "/login";
   static const register = "/register";
   static const home = '/home';
-  static const recipe = '/recipe';
+  static const favorite = '/favorite';
   static const add = '/add';
   static const notification = '/notification';
   static const profile = '/profile';

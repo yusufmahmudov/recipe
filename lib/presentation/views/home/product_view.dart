@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/dto/product_dto.dart';
+import 'package:recipe/data/model/product_model.dart';
 
 class ProductView extends StatefulWidget {
-  const ProductView({super.key});
+  final ProductModel product;
+  const ProductView({super.key, required this.product});
 
   @override
   State<ProductView> createState() => _ProductViewState();
@@ -37,11 +39,14 @@ class _ProductViewState extends State<ProductView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Text(
-                  "Burger xonim manti",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  widget.product.name!,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -72,8 +77,8 @@ class _ProductViewState extends State<ProductView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("SHirinlik", style: originTextStyle),
-                    Text("3", style: originTextStyle),
-                    Text("2:45", style: originTextStyle),
+                    Text("${widget.product.portion!}", style: originTextStyle),
+                    Text(widget.product.time!, style: originTextStyle),
                     Text("8 dona", style: originTextStyle),
                   ],
                 ),
