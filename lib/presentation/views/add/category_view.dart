@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:recipe/application/category/category_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
-import 'package:recipe/data/model/category_model.dart';
 import 'package:recipe/presentation/views/add/add_category_view.dart';
 import 'package:recipe/presentation/widgets/category_widget.dart';
 
@@ -91,12 +90,9 @@ class _CategoryViewState extends State<CategoryView> {
             state.categoryes.sort(
               (a, b) => a.name.toString().compareTo(b.name.toString()),
             );
-            List<CategoryModel> categoryES = state.categoryes;
-            categoryES.add(
-              CategoryModel(id: -1, name: "Kategoriya qo'shish"),
-            );
+
             return ListView.separated(
-              itemCount: categoryES.length,
+              itemCount: state.categoryes.length,
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(height: 12);
               },

@@ -43,6 +43,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
               statusCategory: FormzSubmissionStatus.success,
             ),
           );
+          add(GetCategoryEvent());
         } catch (e) {
           emit(
             state.copyWith(

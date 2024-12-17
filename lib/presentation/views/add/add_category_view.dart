@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
+import 'package:recipe/application/category/category_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
-import 'package:recipe/data/model/category_model.dart';
 import 'package:recipe/data/model/g_model/category_model_g.dart';
-import 'package:recipe/infrasuruktura/apis/category_service.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
+import 'package:recipe/utils/custom_toast_bar.dart';
 
 class AddCategoryView extends StatefulWidget {
   const AddCategoryView({super.key});
@@ -15,85 +16,74 @@ class AddCategoryView extends StatefulWidget {
 }
 
 class _AddCategoryViewState extends State<AddCategoryView> {
-  final CategoryService categoryService = CategoryService();
   final TextEditingController controllerCategory = TextEditingController();
-  List<CategoryModel> categorys = [];
-
-  Future<void> _submitForm() async {
-    final CategoryModelG model = CategoryModelG(name: controllerCategory.text);
-
-    await categoryService.addCategory(model);
-
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
-  }
-
-  Future<List<CategoryModel>> _getAll() async {
-    categorys = await categoryService.fetchCategoryes();
-
-    return categorys;
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
-        title: const Text("Kategoriya qo'shish"),
+        backgroundColor: redOrange,
+        title: const Text(
+          "Kategoriya qo'shish",
+          style: TextStyle(
+            fontSize: 26,
+            color: white,
+          ),
+        ),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: white,
+            size: 26,
+          ),
+        ),
       ),
       bottomNavigationBar: SafeArea(
-        child: WButton(
-          color: redOrange,
-          height: 54,
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          text: "Saqlash",
-          onTap: () {
-            _submitForm();
+        child: BlocBuilder<CategoryBloc, CategoryState>(
+          builder: (context, state) {
+            return WButton(
+              color: redOrange,
+              height: 54,
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              text: "Saqlash",
+              onTap: () {
+                if (controllerCategory.text.isNotEmpty) {
+                  context.read<CategoryBloc>().add(
+                        AddCategoryEvent(
+                          category:
+                              CategoryModelG(name: controllerCategory.text),
+                        ),
+                      );
+                  if (state.statusCategory.isSuccess) {
+                    showCustomToast(
+                        context: context,
+                        message: "Yangi kategoriya saqlandi",
+                        color: green);
+                    Navigator.pop(context);
+                  } else if (state.statusCategory.isFailure) {
+                    showCustomToast(
+                        context: context, message: "Xatolik yuz berdi");
+                    Navigator.pop(context);
+                  }
+                } else {
+                  showCustomToast(
+                      context: context, message: "Kategoriya nomini kiriting!");
+                }
+              },
+            );
           },
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Kategoriya qo'shishdan avval, kategoriyalar ro'yxatini ko'rib chiqing!",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => buildCategoryList(),
-                );
-              },
-              child: Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  color: greyBack.withOpacity(.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Kategoriyalar ro'yxati",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        color: black,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
             CustomTextField(
               controller: controllerCategory,
               title: "Kategoriya qo'shish",
@@ -101,40 +91,6 @@ class _AddCategoryViewState extends State<AddCategoryView> {
               borderColor: redOrange,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildCategoryList() {
-    _getAll();
-    return AlertDialog(
-      backgroundColor: white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      title: const Text("Kategoriyalar"),
-      actions: <Widget>[
-        TextButton(
-          child: const Text(
-            "Ortga qaytish",
-            style: TextStyle(color: black, fontSize: 18),
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-      content: SizedBox(
-        width: double.maxFinite,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: categorys.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text("${index + 1} - ${categorys[index].name!}"),
-            );
-          },
         ),
       ),
     );
