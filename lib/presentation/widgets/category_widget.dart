@@ -25,7 +25,7 @@ class CategoryWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddProductView(categoryId: category.id!),
+              builder: (context) => AddProductView(categoryModel: category),
             ),
           );
         }

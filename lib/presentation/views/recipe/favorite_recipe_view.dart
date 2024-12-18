@@ -21,9 +21,9 @@ class _FavoriteRecipeViewState extends State<FavoriteRecipeView>
   late TabController _tabController;
 
   void navigateToProductPage(BuildContext context, ProductModel product) {
-    Navigator.of(context).push(
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (context) => ProductView(product: product),
+        builder: (context) => ProductView(product: product, index: 1),
       ),
     );
   }
@@ -39,12 +39,19 @@ class _FavoriteRecipeViewState extends State<FavoriteRecipeView>
   @override
   void initState() {
     super.initState();
-    context.read<ProductBloc>().add(GetProductsByUserIdEvent());
     context.read<ProductBloc>().add(GetFavoriteProductEvent());
 
     _tabController = TabController(length: 2, vsync: this);
+
     _tabController.addListener(() {
-      setState(() {}); // Tab o'zgarganda UI yangilanishi uchun
+      if (_tabController.index == 0) {
+        // Sevimli retseptlarni yuklash
+        context.read<ProductBloc>().add(GetFavoriteProductEvent());
+      } else {
+        // Mening retseptlarimni yuklash
+        context.read<ProductBloc>().add(GetProductsByUserIdEvent());
+      }
+      setState(() {});
     });
   }
 
@@ -53,6 +60,7 @@ class _FavoriteRecipeViewState extends State<FavoriteRecipeView>
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: white,
         appBar: AppBar(
           title: const Text(
             "Retseptlar",
@@ -97,14 +105,14 @@ class _FavoriteRecipeViewState extends State<FavoriteRecipeView>
           children: [
             BlocBuilder<ProductBloc, ProductState>(
               builder: (context, state) {
-                if (state.statusProduct.isInProgress) {
+                if (state.statusFavorite.isInProgress) {
                   return const Center(
                     child: CircularProgressIndicator(
                       color: Colors.red,
                       strokeWidth: 4.0,
                     ),
                   );
-                } else if (state.products.isEmpty) {
+                } else if (state.favoriteProducts.isEmpty) {
                   return const Center(
                     child: Text(
                       "Retseptlar ro'yxati bo'sh",
@@ -163,7 +171,7 @@ class _FavoriteRecipeViewState extends State<FavoriteRecipeView>
                                             CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            "Time",
+                                            "Vaqt",
                                             style: TextStyle(color: gray),
                                           ),
                                           Text(

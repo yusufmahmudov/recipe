@@ -23,4 +23,17 @@ class CategoryService {
       throw Exception('Xatolik yuz berdi: $e');
     }
   }
+
+  Future<List<CategoryModel>> fetchCategoryeById(int categoryId) async {
+    try {
+      final List<dynamic> response = await supabase
+          .from(Tables.category.text)
+          .select()
+          .eq("id", categoryId);
+
+      return response.map((json) => CategoryModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
 }

@@ -8,6 +8,7 @@ import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
+import 'package:recipe/utils/log_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -43,10 +44,11 @@ class ProductService {
     try {
       int userId = StorageRepository.getInt(StorageKeys.USERID);
 
-      final dynamic response = await supabase
+      final response = await supabase
           .from(Tables.product.text)
           .select()
           .eq('user_id', userId);
+      response.map((e) => Log.i(e.values));
 
       return response.map((json) => ProductModel.fromJson(json)).toList();
     } catch (e) {
@@ -75,7 +77,7 @@ class ProductService {
           .map((json) => ProductModel.fromJson(json))
           .toList()
           .first;
-          
+
       if (image != null) {
         uploadProductImage(image, productModelC);
       }
@@ -195,6 +197,8 @@ class ProductService {
           .from(Tables.product.text)
           .select()
           .filter("id", "in", "($ids)");
+
+      Log.i(response.length);
 
       return response.map((e) => ProductModel.fromJson(e)).toList();
     } catch (e) {

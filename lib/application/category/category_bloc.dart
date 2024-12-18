@@ -31,6 +31,27 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       },
     );
 
+    on<GetCategoryByIdEvent>(
+      (event, emit) async {
+        emit(state.copyWith(statusCategory: FormzSubmissionStatus.inProgress));
+        try {
+          final result =
+              await CategoryService().fetchCategoryeById(event.categoryId);
+          emit(
+            state.copyWith(
+                categoryes: result,
+                statusCategory: FormzSubmissionStatus.success),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(
+              statusCategory: FormzSubmissionStatus.failure,
+            ),
+          );
+        }
+      },
+    );
+
     on<AddCategoryEvent>(
       (event, emit) async {
         emit(state.copyWith(statusCategory: FormzSubmissionStatus.inProgress));

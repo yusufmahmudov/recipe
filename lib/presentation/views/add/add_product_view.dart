@@ -18,10 +18,11 @@ import 'package:recipe/presentation/views/add/serves_view.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
 import 'package:recipe/utils/custom_toast_bar.dart';
+import 'package:recipe/utils/log_service.dart';
 
 class AddProductView extends StatefulWidget {
-  final int categoryId;
-  const AddProductView({super.key, required this.categoryId});
+  final CategoryModel categoryModel;
+  const AddProductView({super.key, required this.categoryModel});
 
   @override
   State<AddProductView> createState() => _AddProductViewState();
@@ -104,7 +105,7 @@ class _AddProductViewState extends State<AddProductView> {
   }
 
   String timeSetup() {
-    return "${selHour.value}:${selMinute.value < 10 ? '0' : ''}${selMinute.value}";
+    return "${selHour.value < 10 ? '0' : ''}${selHour.value}:${selMinute.value < 10 ? '0' : ''}${selMinute.value}";
   }
 
   @override
@@ -178,10 +179,12 @@ class _AddProductViewState extends State<AddProductView> {
                     name: controllerRecipe.text,
                     portion: int.tryParse(controllerPortion.text) ?? 0,
                     time: time,
-                    categoryId: widget.categoryId,
+                    categoryId: widget.categoryModel.id,
+                    categoryName: widget.categoryModel.name,
+                    ingredientCount: ingredients.length,
                     userId: userId,
                   );
-
+                  Log.i(product.categoryName);
                   context.read<ProductBloc>().add(
                         AddProductEvent(
                           productG: product,

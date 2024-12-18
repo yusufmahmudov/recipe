@@ -12,11 +12,11 @@ class MyRecipeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => ProductView(
               product: product,
+              index: 0,
             ),
           ),
         );
@@ -53,7 +53,7 @@ class MyRecipeWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    product.name!,
+                    product.categoryName!,
                     maxLines: 1,
                     style: const TextStyle(
                       fontSize: 16,
@@ -85,7 +85,7 @@ class MyRecipeWidget extends StatelessWidget {
                                     ),
                                   ),
                                   TextSpan(
-                                    text: product.time!,
+                                    text: " ${product.time!}",
                                   ),
                                 ],
                               ),

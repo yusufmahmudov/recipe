@@ -15,7 +15,10 @@ class ProductModel {
   final int? portion;
   final String? time;
   final int? categoryId;
+  final String? categoryName;
   final int? userId;
+  final int? ingredientCount;
+
   String? imageUrl;
 
   ProductModel({
@@ -24,19 +27,22 @@ class ProductModel {
     this.portion,
     this.time,
     this.categoryId,
+    this.categoryName,
     this.userId,
     this.imageUrl,
+    this.ingredientCount,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
-        id: json["id"],
-        name: json["name"],
-        portion: json["portion"],
-        time: json["time"],
-        categoryId: json["category_id"],
-        userId: json["user_id"],
-        imageUrl: json["image_url"],
-      );
+      id: json["id"],
+      name: json["name"],
+      portion: json["portion"],
+      time: json["time"],
+      categoryId: json["category_id"],
+      categoryName: json["category_name"],
+      userId: json["user_id"],
+      imageUrl: json["image_url"],
+      ingredientCount: json["ingredient_count"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -44,7 +50,9 @@ class ProductModel {
         "portion": portion,
         "time": time,
         "category_id": categoryId,
+        "category_name": categoryName,
         "user_id": userId,
         "image_url": imageUrl,
+        "ingredient_count": ingredientCount,
       };
 }

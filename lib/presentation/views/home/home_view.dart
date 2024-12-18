@@ -31,7 +31,7 @@ class _HomeViewState extends State<HomeView> {
   void navigateToProductPage(BuildContext context, ProductModel product) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ProductView(product: product),
+        builder: (context) => ProductView(product: product, index: 2),
       ),
     );
   }

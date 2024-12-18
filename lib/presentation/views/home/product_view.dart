@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe/application/category/category_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/dto/product_dto.dart';
 import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/presentation/views/add/add_category_view.dart';
 
 class ProductView extends StatefulWidget {
   final ProductModel product;
-  const ProductView({super.key, required this.product});
+  final int index;
+  const ProductView({super.key, required this.product, required this.index});
 
   @override
   State<ProductView> createState() => _ProductViewState();
@@ -24,18 +28,58 @@ class _ProductViewState extends State<ProductView> {
   );
 
   @override
+  void initState() {
+    context
+        .read<CategoryBloc>()
+        .add(GetCategoryByIdEvent(categoryId: widget.product.categoryId!));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
-        title: const Text('Retsept'),
+        backgroundColor: redOrange,
+        title: const Text(
+          'Retsept',
+          style: TextStyle(
+            fontSize: 24,
+            color: white,
+          ),
+        ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 28,
+            color: white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          if (widget.index == 0) ...[
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddCategoryView(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.edit,
+                color: white,
+                size: 22,
+              ),
+            ),
+          ],
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -76,10 +120,12 @@ class _ProductViewState extends State<ProductView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("SHirinlik", style: originTextStyle),
+                    Text("${widget.product.categoryName}",
+                        style: originTextStyle),
                     Text("${widget.product.portion!}", style: originTextStyle),
                     Text(widget.product.time!, style: originTextStyle),
-                    Text("8 dona", style: originTextStyle),
+                    Text("${widget.product.ingredientCount!}",
+                        style: originTextStyle),
                   ],
                 ),
               ],

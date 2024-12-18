@@ -91,6 +91,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
             ),
           );
           add(GetProductsEvent());
+          // add(GetFavoriteProductEvent());
+          // add(GetProductsByUserIdEvent());
         } catch (e) {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),
@@ -113,6 +115,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
               statusProduct: FormzSubmissionStatus.success,
             ),
           );
+          add(GetProductsEvent());
+          add(GetFavoriteProductEvent());
+          add(GetProductsByUserIdEvent());
         } catch (e) {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),
@@ -132,6 +137,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
               statusProduct: FormzSubmissionStatus.success,
             ),
           );
+          add(GetProductsEvent());
+          add(GetFavoriteProductEvent());
+          add(GetProductsByUserIdEvent());
         } catch (e) {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),
@@ -169,6 +177,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
               statusFavorite: FormzSubmissionStatus.success,
             ),
           );
+          add(GetFavoriteProductEvent());
         } catch (e) {
           emit(
             state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
