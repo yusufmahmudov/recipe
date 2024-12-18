@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:recipe/application/category/category_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:recipe/assets/colors/colors.dart';
-import 'package:recipe/data/dto/product_dto.dart';
 import 'package:recipe/data/model/product_model.dart';
 import 'package:recipe/presentation/views/add/add_category_view.dart';
+import 'package:recipe/utils/log_service.dart';
+import '../../../application/product/product_bloc.dart';
 
 class ProductView extends StatefulWidget {
   final ProductModel product;
@@ -30,8 +31,8 @@ class _ProductViewState extends State<ProductView> {
   @override
   void initState() {
     context
-        .read<CategoryBloc>()
-        .add(GetCategoryByIdEvent(categoryId: widget.product.categoryId!));
+        .read<ProductBloc>()
+        .add(GetProductParts(productId: widget.product.id!));
 
     super.initState();
   }
@@ -131,64 +132,94 @@ class _ProductViewState extends State<ProductView> {
               ],
             ),
             const SizedBox(height: 12),
-            const Text(
-              "Mahsulotlar",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            ...List.generate(
-              products.length,
-              (index) {
-                if (index != products.length) {
-                  return _buildIngredientRow(index);
+            BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state.statusIngredient.isInProgress) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.red,
+                      strokeWidth: 4.0,
+                    ),
+                  );
+                } else if (state.ingredients.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "Mahsulotlar ro'yxati bo'sh",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
                 }
-                return const Text("Error");
-              },
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              "Tayyorlash jarayoni",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            ...List.generate(
-              products.length,
-              (index) {
-                if (index != products.length) {
-                  return _buildServesRow(index);
-                }
-                return const Text("Error");
+
+                final ingredients = ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) => Row(
+                    children: [
+                      const Text(
+                        "  ·  ",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w900),
+                      ),
+                      Text(
+                        "${state.ingredients[index].ingredient}   ${state.ingredients[index].quantity}",
+                        style: originTextStyle,
+                      ),
+                    ],
+                  ),
+                  separatorBuilder: (context, index) => const SizedBox(
+                    height: 4,
+                  ),
+                  itemCount: state.ingredients.length,
+                );
+                Log.i(state.serveses.first.servesBody);
+                final serveres = ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${index + 1}-jarayon: ${state.serveses[index].servesName}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
+                      ),
+
+                      Text("${state.serveses[index].servesBody}",
+                          style: originTextStyle),
+                      const SizedBox(height: 14),
+                    ],
+                  ),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 6),
+                  itemCount: state.serveses.length,
+                );
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Mahsulotlar",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    ingredients,
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Tayyorlash jarayoni",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    serveres,
+                  ],
+                );
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildIngredientRow(int index) {
-    return Row(
-      children: [
-        const Text(
-          "  ·  ",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-        ),
-        Text("Tuxum   4 dona", style: originTextStyle),
-      ],
-    );
-  }
-
-  Widget _buildServesRow(int index) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "${index + 1}-jarayon: ${products[index]['name']}",
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        Text(
-            "An interpunct ·, also known as an interpoint, middle dot, middot, centered dot or centred dot, is a punctuation mark consisting of a vertically centered dot used for interword separation in Classical Latin. (Word-separating spaces did not appear until some time between 600 and 800 CE.)",
-            style: originTextStyle),
-        const SizedBox(height: 14),
-      ],
     );
   }
 }

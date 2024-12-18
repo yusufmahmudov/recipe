@@ -8,7 +8,6 @@ import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
-import 'package:recipe/utils/log_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -48,7 +47,6 @@ class ProductService {
           .from(Tables.product.text)
           .select()
           .eq('user_id', userId);
-      response.map((e) => Log.i(e.values));
 
       return response.map((json) => ProductModel.fromJson(json)).toList();
     } catch (e) {
@@ -111,6 +109,19 @@ class ProductService {
     }
   }
 
+  Future<List<IngredientModel>> fetchProductIngredients(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.ingredient.text)
+          .select()
+          .eq("product_id", productId);
+
+      return response.map((e) => IngredientModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Xatolik yuz berdi $e");
+    }
+  }
+
   Future<void> addPreparations(
       List<Map<String, String>> preparations, int productId) async {
     try {
@@ -132,6 +143,19 @@ class ProductService {
       await supabase.from(Tables.serves.text).insert(jsonList);
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
+
+  Future<List<ServesModel>> fetchProductPreparations(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.serves.text)
+          .select()
+          .eq("product_id", productId);
+
+      return response.map((e) => ServesModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Xatolik yuz berdi $e");
     }
   }
 
@@ -197,8 +221,6 @@ class ProductService {
           .from(Tables.product.text)
           .select()
           .filter("id", "in", "($ids)");
-
-      Log.i(response.length);
 
       return response.map((e) => ProductModel.fromJson(e)).toList();
     } catch (e) {

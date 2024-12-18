@@ -24,7 +24,7 @@ class _ServesViewState extends State<ServesView> {
       setState(() {
         widget.preparations.add({
           'name': controllerProcessName.text,
-          'process': controllerProcess.text,
+          'body': controllerProcess.text,
         });
         controllerProcessName.clear();
         controllerProcess.clear();
@@ -68,7 +68,7 @@ class _ServesViewState extends State<ServesView> {
                   widget.preparations.add(
                     {
                       'name': controllerProcessName.text,
-                      'process': controllerProcess.text,
+                      'body': controllerProcess.text,
                     },
                   );
                   controllerProcessName.clear();
@@ -196,7 +196,7 @@ class _ServesViewState extends State<ServesView> {
             noHeight: true,
             minLines: 3,
             readOnly: true,
-            hintText: widget.preparations[index]['process']!,
+            hintText: widget.preparations[index]['body']!,
             borderColor: greyBack.withOpacity(.8),
           ),
         ],

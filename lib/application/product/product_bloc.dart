@@ -4,7 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:recipe/data/model/g_model/product_model_g.dart';
+import 'package:recipe/data/model/ingredient_model.dart';
 import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
 
@@ -144,6 +146,29 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           emit(
             state.copyWith(statusProduct: FormzSubmissionStatus.failure),
           );
+        }
+      },
+    );
+
+    on<GetProductParts>(
+      (event, emit) async {
+        emit(
+            state.copyWith(statusIngredient: FormzSubmissionStatus.inProgress));
+        try {
+          final result =
+              await ProductService().fetchProductIngredients(event.productId);
+          final result2 =
+              await ProductService().fetchProductPreparations(event.productId);
+              
+          emit(
+            state.copyWith(
+              statusIngredient: FormzSubmissionStatus.success,
+              ingredients: result,
+              serveses: result2,
+            ),
+          );
+        } catch (e) {
+          emit(state.copyWith(statusIngredient: FormzSubmissionStatus.failure));
         }
       },
     );
