@@ -26,6 +26,12 @@ class AddProductEvent extends ProductEvent {
   });
 }
 
+class GetProductParts extends ProductEvent {
+  final int productId;
+
+  GetProductParts({required this.productId});
+}
+
 class UpdateProductEvent extends ProductEvent {
   final ProductModel product;
   final List<Map<String, String>> ingredients;

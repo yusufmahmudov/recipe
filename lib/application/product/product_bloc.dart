@@ -150,6 +150,29 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       },
     );
 
+    on<GetProductParts>(
+      (event, emit) async {
+        emit(
+            state.copyWith(statusIngredient: FormzSubmissionStatus.inProgress));
+        try {
+          final result =
+              await ProductService().fetchProductIngredients(event.productId);
+          final result2 =
+              await ProductService().fetchProductPreparations(event.productId);
+              
+          emit(
+            state.copyWith(
+              statusIngredient: FormzSubmissionStatus.success,
+              ingredients: result,
+              serveses: result2,
+            ),
+          );
+        } catch (e) {
+          emit(state.copyWith(statusIngredient: FormzSubmissionStatus.failure));
+        }
+      },
+    );
+
     on<GetFavoriteProductEvent>(
       (event, emit) async {
         emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));

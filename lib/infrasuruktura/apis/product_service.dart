@@ -109,6 +109,19 @@ class ProductService {
     }
   }
 
+  Future<List<IngredientModel>> fetchProductIngredients(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.ingredient.text)
+          .select()
+          .eq("product_id", productId);
+
+      return response.map((e) => IngredientModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Xatolik yuz berdi $e");
+    }
+  }
+
   Future<void> addPreparations(
       List<Map<String, String>> preparations, int productId) async {
     try {
@@ -130,6 +143,19 @@ class ProductService {
       await supabase.from(Tables.serves.text).insert(jsonList);
     } catch (e) {
       throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
+
+  Future<List<ServesModel>> fetchProductPreparations(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.serves.text)
+          .select()
+          .eq("product_id", productId);
+
+      return response.map((e) => ServesModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Xatolik yuz berdi $e");
     }
   }
 
