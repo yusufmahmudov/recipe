@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:recipe/application/category/category_bloc.dart';
+import 'package:recipe/application/home_bloc/home_bloc.dart';
 import 'package:recipe/application/product/product_bloc.dart';
 import 'package:recipe/application/user/user_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
@@ -27,13 +28,30 @@ class AppView extends StatelessWidget {
               GetUserById(),
             ),
         ),
+        BlocProvider(
+          create: (context) => UserBloc(),
+        ),
+        BlocProvider(
+          create: (context) => HomeBloc(),
+        ),
       ],
       child: MaterialApp.router(
         restorationScopeId: 'app',
         debugShowCheckedModeBanner: false,
         routerConfig: AppRoutes.router,
-        theme:
-            ThemeData(appBarTheme: const AppBarTheme(surfaceTintColor: white)),
+        theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+            surfaceTintColor: white,
+            backgroundColor: white,
+            iconTheme: IconThemeData(color: redOrange),
+            centerTitle: true,
+            titleTextStyle: TextStyle(
+              fontSize: 22,
+              color: redOrange,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
         builder: (context, child) {
           return BlocListener<UserBloc, UserState>(
             listener: (context, state) {

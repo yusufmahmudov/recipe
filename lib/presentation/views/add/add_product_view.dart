@@ -18,7 +18,6 @@ import 'package:recipe/presentation/views/add/serves_view.dart';
 import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
 import 'package:recipe/utils/custom_toast_bar.dart';
-import 'package:recipe/utils/log_service.dart';
 
 class AddProductView extends StatefulWidget {
   final CategoryModel categoryModel;
@@ -113,22 +112,8 @@ class _AddProductViewState extends State<AddProductView> {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
-        backgroundColor: redOrange,
         title: const Text(
           'Yangi retsept',
-          style: TextStyle(
-            fontSize: 24,
-            color: white,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: white,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       bottomNavigationBar: SafeArea(
@@ -184,7 +169,6 @@ class _AddProductViewState extends State<AddProductView> {
                     ingredientCount: ingredients.length,
                     userId: userId,
                   );
-                  Log.i(product.categoryName);
                   context.read<ProductBloc>().add(
                         AddProductEvent(
                           productG: product,

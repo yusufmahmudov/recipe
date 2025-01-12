@@ -2,8 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:recipe/application/category/category_bloc.dart';
-import 'package:recipe/application/product/product_bloc.dart';
+import 'package:recipe/application/home_bloc/home_bloc.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/model/product_model.dart';
 import 'package:recipe/presentation/views/home/product_view.dart';
@@ -17,15 +16,22 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  ValueNotifier<int> selIndex = ValueNotifier(0);
+  ValueNotifier<int?> selectedCategoryId = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
-    context.read<CategoryBloc>().add(GetCategoryEvent());
-    context
-        .read<ProductBloc>()
-        .add(GetProductsByCategoryEvent(categoryId: selIndex.value));
+    context.read<HomeBloc>().add(GetCategoryEvent());
+    // context
+    //     .read<ProductBloc>()
+    //     .add(GetProductsByCategoryEvent(categoryId: selectedCategoryId.value!));
+
+    selectedCategoryId.addListener(() {
+      if (selectedCategoryId.value != null) {
+        context.read<HomeBloc>().add(GetProductsByCategoryEvent(
+            categoryId: selectedCategoryId.value! + 1));
+      }
+    });
   }
 
   void navigateToProductPage(BuildContext context, ProductModel product) {
@@ -38,11 +44,11 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: white,
-        appBar: AppBar(
-          title: const CustomTextField(
+    return Scaffold(
+      backgroundColor: white,
+      appBar: AppBar(
+        title: const SafeArea(
+          child: CustomTextField(
             textAlign: TextAlign.start,
             keyboardType: TextInputType.text,
             borderColor: gray,
@@ -55,16 +61,27 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
         ),
-        body: NestedScrollView(
+      ),
+      body: RefreshIndicator.adaptive(
+        onRefresh: () async {
+          context.read<HomeBloc>().add(GetCategoryEvent());
+          if (selectedCategoryId.value != null) {
+            context.read<HomeBloc>().add(GetProductsByCategoryEvent(
+                categoryId: selectedCategoryId.value! + 1));
+          }
+          await Future.delayed(Duration.zero);
+        },
+        child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 400),
                 height: 48,
+                padding: const EdgeInsets.only(top: 4),
                 child: ValueListenableBuilder(
-                  valueListenable: selIndex,
+                  valueListenable: selectedCategoryId,
                   builder: (context, value, child) {
-                    return BlocBuilder<CategoryBloc, CategoryState>(
+                    return BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) {
                         if (state.statusCategory.isInProgress) {
                           return const Center(
@@ -84,43 +101,50 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           );
                         }
-                        return ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          scrollDirection: Axis.horizontal,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(width: 16),
-                          itemCount: state.categoryes.length,
-                          itemBuilder: (context, index) => GestureDetector(
-                            onTap: () => selIndex.value = index,
-                            child: Container(
+                        return ValueListenableBuilder(
+                          valueListenable: selectedCategoryId,
+                          builder: (context, value, child) {
+                            return ListView.separated(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16),
-                              height: 34,
-                              decoration: BoxDecoration(
-                                color: value == index
-                                    ? redOrange
-                                    : Colors.transparent,
-                                border: value == index
-                                    ? Border.all(color: redOrange)
-                                    : null,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    state.categoryes[index].name!,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          value == index ? white : redOrange20,
-                                    ),
+                              scrollDirection: Axis.horizontal,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 16),
+                              itemCount: state.categoryes.length,
+                              itemBuilder: (context, index) => GestureDetector(
+                                onTap: () => selectedCategoryId.value = index,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: value == index
+                                        ? redOrange
+                                        : Colors.transparent,
+                                    border: value == index
+                                        ? Border.all(color: redOrange)
+                                        : null,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                ],
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        state.categoryes[index].name!,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: value == index
+                                              ? white
+                                              : redOrange20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
                       },
                     );
@@ -129,7 +153,7 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
           ],
-          body: BlocBuilder<ProductBloc, ProductState>(
+          body: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
               if (state.statusProduct.isInProgress) {
                 return const Center(
@@ -205,22 +229,6 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                       ],
                                     ),
-                                    // IconButton(
-                                    //   icon: Icon(
-                                    //     products[index]['isSelected']
-                                    //         ? Icons.favorite
-                                    //         : Icons.favorite_border_outlined,
-                                    //   ),
-                                    //   color: products[index]['isSelected']
-                                    //       ? redOrange
-                                    //       : natural20,
-                                    //   onPressed: () {
-                                    //     setState(() {
-                                    //       products[index]['isSelected'] =
-                                    //           !products[index]['isSelected'];
-                                    //     });
-                                    //   },
-                                    // )
                                   ],
                                 )
                               ],

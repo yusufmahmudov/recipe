@@ -22,7 +22,7 @@ class MainView extends StatelessWidget {
         selectedItemColor: redOrange,
         unselectedItemColor: redOrange20,
         currentIndex: navigationShell.currentIndex,
-        // type: BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed,
         onTap: (value) {
           _onTap(context, value);
         },
@@ -35,10 +35,10 @@ class MainView extends StatelessWidget {
             icon: Icon(Icons.receipt_rounded),
             label: 'Recipe',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_rounded),
-            label: 'Notfication',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.notifications_rounded),
+          //   label: 'Notfication',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle_rounded),
             label: 'Profile',

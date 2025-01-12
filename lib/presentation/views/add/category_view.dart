@@ -25,25 +25,25 @@ class _CategoryViewState extends State<CategoryView> {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
-        backgroundColor: redOrange,
+        // backgroundColor: redOrange,
         title: const Text(
           "Kategoriyalar",
-          style: TextStyle(
-            fontSize: 26,
-            color: white,
-          ),
+          // style: TextStyle(
+          //   fontSize: 26,
+          //   color: white,
+          // ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: white,
-            size: 26,
-          ),
-        ),
+        // centerTitle: true,
+        // leading: IconButton(
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        //   icon: const Icon(
+        //     Icons.arrow_back,
+        //     color: white,
+        //     size: 26,
+        //   ),
+        // ),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -51,7 +51,7 @@ class _CategoryViewState extends State<CategoryView> {
               icon: const Icon(
                 Icons.add,
                 size: 28,
-                color: white,
+                color: redOrange,
               ),
               onPressed: () {
                 Navigator.push(

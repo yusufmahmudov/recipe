@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/utils/log_service.dart';
 
 class PdfsView extends StatefulWidget {
@@ -10,21 +11,19 @@ class PdfsView extends StatefulWidget {
 }
 
 class _PdfsViewState extends State<PdfsView> {
-  late PdfControllerPinch pdfControllerPinch;
+  // late PdfControllerPinch pdfControllerPinch;
   late PdfController pdfController;
+  int totalPageCount = 0, currentPage = 1;
 
   @override
   void initState() {
-    Log.i("pdfController.document");
-
     try {
-      pdfControllerPinch = PdfControllerPinch(
-        document: PdfDocument.openAsset("assets/pdfs/11111.pdf"),
-      );
+      // pdfControllerPinch = PdfControllerPinch(
+      //   document: PdfDocument.openAsset("assets/pdfs/11111.pdf"),
+      // );   https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
       pdfController = PdfController(
-        document: PdfDocument.openAsset('assets/pdfs/11111.pdf'),
+        document: PdfDocument.openAsset('assets/pdfs/22222.pdf'),
       );
-      Log.i(pdfController.document);
     } catch (e) {
       Log.e(e);
     }
@@ -40,13 +39,42 @@ class _PdfsViewState extends State<PdfsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
+        backgroundColor: white,
         title: const Text("Books"),
       ),
       body: Column(
         children: [
-          const Row(
-            children: [],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Total page: $totalPageCount"),
+              IconButton(
+                onPressed: () {
+                  pdfController.previousPage(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.linear,
+                  );
+                },
+                icon: const Icon(
+                  Icons.arrow_back,
+                ),
+              ),
+              Text("$currentPage"),
+              IconButton(
+                onPressed: () {
+                  pdfController.nextPage(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.linear,
+                  );
+                },
+                icon: const Icon(
+                  Icons.arrow_forward,
+                ),
+              ),
+            ],
           ),
           pdfWidget()
         ],
@@ -57,8 +85,18 @@ class _PdfsViewState extends State<PdfsView> {
   Widget pdfWidget() {
     return Expanded(
       child: PdfView(
-        scrollDirection: Axis.vertical,
+        scrollDirection: Axis.horizontal,
         controller: pdfController,
+        onDocumentLoaded: (document) {
+          setState(() {
+            totalPageCount = document.pagesCount;
+          });
+        },
+        onPageChanged: (page) {
+          setState(() {
+            currentPage = page;
+          });
+        },
       ),
     );
   }

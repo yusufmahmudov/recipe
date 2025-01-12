@@ -46,6 +46,12 @@ class DeleteProductEvent extends ProductEvent {
 
 class GetFavoriteProductEvent extends ProductEvent {}
 
+class GetFavoriteProductById extends ProductEvent {
+  final int productId;
+
+  GetFavoriteProductById({required this.productId});
+}
+
 class AddFavoriteEvent extends ProductEvent {
   final int productId;
 
@@ -56,4 +62,16 @@ class DeleteFavoriteEvent extends ProductEvent {
   final int productId;
 
   DeleteFavoriteEvent({required this.productId});
+}
+
+class GetProductIngredient extends ProductEvent {
+  final int productId;
+
+  GetProductIngredient({required this.productId});
+}
+
+class GetProductServes extends ProductEvent {
+  final int productId;
+
+  GetProductServes({required this.productId});
 }

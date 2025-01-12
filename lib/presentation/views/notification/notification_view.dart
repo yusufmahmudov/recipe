@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipe/assets/colors/colors.dart';
-import 'package:recipe/presentation/views/notification/pdfs_view.dart';
+import 'package:recipe/presentation/views/notification/epub_view_page.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -11,9 +11,14 @@ class NotificationView extends StatefulWidget {
 
 class _NotificationViewState extends State<NotificationView> {
   void navigateToBooksItemPage(BuildContext context) {
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => const PdfsView(),
+    //   ),
+    // );
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const PdfsView(),
+        builder: (context) => const EpubViewPage(),
       ),
     );
   }

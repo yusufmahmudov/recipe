@@ -5,7 +5,6 @@ import 'package:recipe/presentation/views/error_view.dart';
 import 'package:recipe/presentation/views/home/home_view.dart';
 import 'package:recipe/presentation/views/info_view.dart';
 import 'package:recipe/presentation/views/main_view.dart';
-import 'package:recipe/presentation/views/notification/notification_view.dart';
 import 'package:recipe/presentation/views/profile/login_view.dart';
 import 'package:recipe/presentation/views/profile/profile_view.dart';
 import 'package:recipe/presentation/views/profile/register_view.dart';
@@ -82,14 +81,14 @@ sealed class AppRoutes {
           ),
         ],
       ),
-      StatefulShellBranch(
-        routes: [
-          GoRoute(
-            path: AppRouteName.notification,
-            builder: (context, state) => const NotificationView(),
-          ),
-        ],
-      ),
+      // StatefulShellBranch(
+      //   routes: [
+      //     GoRoute(
+      //       path: AppRouteName.notification,
+      //       builder: (context, state) => const NotificationView(),
+      //     ),
+      //   ],
+      // ),
       StatefulShellBranch(
         routes: [
           GoRoute(

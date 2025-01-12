@@ -8,7 +8,6 @@ import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/repo/storage_repository.dart';
 import 'package:recipe/utils/enum_filtr.dart';
-import 'package:recipe/utils/log_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -48,7 +47,6 @@ class ProductService {
           .from(Tables.product.text)
           .select()
           .eq('user_id', userId);
-      response.map((e) => Log.i(e.values));
 
       return response.map((json) => ProductModel.fromJson(json)).toList();
     } catch (e) {
@@ -198,11 +196,37 @@ class ProductService {
           .select()
           .filter("id", "in", "($ids)");
 
-      Log.i(response.length);
-
       return response.map((e) => ProductModel.fromJson(e)).toList();
     } catch (e) {
       throw Exception("Xatolik yuz berdi $e");
+    }
+  }
+
+  // Mahsulotni ingredintlarini olish
+  Future<List<IngredientModel>> fetchProductIngredient(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.ingredient.text)
+          .select()
+          .eq('product_id', productId);
+
+      return response.map((json) => IngredientModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Xatolik yuz berdi: $e');
+    }
+  }
+
+  // Mahsulotni tayyorlash jarayonini olish
+  Future<List<ServesModel>> fetchProductServes(int productId) async {
+    try {
+      final response = await supabase
+          .from(Tables.serves.text)
+          .select()
+          .eq('product_id', productId);
+
+      return response.map((json) => ServesModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Xatolik yuz berdi: $e');
     }
   }
 }

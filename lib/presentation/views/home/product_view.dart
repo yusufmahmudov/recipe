@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:recipe/application/category/category_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:recipe/assets/colors/colors.dart';
-import 'package:recipe/data/dto/product_dto.dart';
+import 'package:recipe/data/model/ingredient_model.dart';
 import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/presentation/views/add/add_category_view.dart';
+import 'package:recipe/utils/log_service.dart';
+
+import '../../../application/product/product_bloc.dart';
 
 class ProductView extends StatefulWidget {
   final ProductModel product;
@@ -16,11 +20,14 @@ class ProductView extends StatefulWidget {
 }
 
 class _ProductViewState extends State<ProductView> {
+  late bool favorite = false;
+
   final TextStyle defaultTextStyle = TextStyle(
     fontSize: 16,
     color: greyBack.withOpacity(.6),
     fontWeight: FontWeight.w400,
   );
+
   final TextStyle originTextStyle = const TextStyle(
     fontSize: 16,
     color: black,
@@ -30,9 +37,16 @@ class _ProductViewState extends State<ProductView> {
   @override
   void initState() {
     context
-        .read<CategoryBloc>()
-        .add(GetCategoryByIdEvent(categoryId: widget.product.categoryId!));
+        .read<ProductBloc>()
+        .add(GetProductIngredient(productId: widget.product.id!));
 
+    context
+        .read<ProductBloc>()
+        .add(GetProductServes(productId: widget.product.id!));
+
+    context
+        .read<ProductBloc>()
+        .add(GetFavoriteProductById(productId: widget.product.id!));
     super.initState();
   }
 
@@ -41,22 +55,8 @@ class _ProductViewState extends State<ProductView> {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
-        backgroundColor: redOrange,
         title: const Text(
           'Retsept',
-          style: TextStyle(
-            fontSize: 24,
-            color: white,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: white,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
         actions: [
           if (widget.index == 0) ...[
@@ -71,11 +71,59 @@ class _ProductViewState extends State<ProductView> {
               },
               icon: const Icon(
                 Icons.edit,
-                color: white,
+                color: redOrange,
                 size: 22,
               ),
             ),
-          ],
+          ] else ...[
+            BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state.statusFavorite.isFailure) {
+                  return const Center(
+                    child: Icon(
+                      Icons.abc,
+                      color: white,
+                    ),
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: () {
+                      try {
+                        state.selProduct == -1
+                            ? context.read<ProductBloc>().add(
+                                  AddFavoriteEvent(
+                                    productId: widget.product.id!,
+                                  ),
+                                )
+                            : context.read<ProductBloc>().add(
+                                  DeleteFavoriteEvent(
+                                    productId: widget.product.id!,
+                                  ),
+                                );
+
+                        context.read<ProductBloc>().add(GetFavoriteProductById(
+                            productId: widget.product.id!));
+                      } catch (e) {
+                        Log.d(e);
+                      }
+                    },
+                    icon: state.selProduct != -1
+                        ? const Icon(
+                            Icons.favorite,
+                            size: 26,
+                          )
+                        : const Icon(
+                            Icons.favorite_border_outlined,
+                            size: 26,
+                          ),
+                  ),
+                );
+              },
+            ),
+          ]
         ],
       ),
       body: SingleChildScrollView(
@@ -83,6 +131,17 @@ class _ProductViewState extends State<ProductView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                'assets/images/Background.png',
+                width: 334,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 14),
             Row(
               children: [
                 Text(
@@ -93,16 +152,6 @@ class _ProductViewState extends State<ProductView> {
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                'assets/images/Background.png',
-                width: 334,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
             ),
             const SizedBox(height: 10),
             Row(
@@ -132,16 +181,40 @@ class _ProductViewState extends State<ProductView> {
             ),
             const SizedBox(height: 12),
             const Text(
-              "Mahsulotlar",
+              "Kerakli mahsulotlar",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            ...List.generate(
-              products.length,
-              (index) {
-                if (index != products.length) {
-                  return _buildIngredientRow(index);
+            BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state.statusIngredient.isInProgress) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.red,
+                      strokeWidth: 4.0,
+                    ),
+                  );
+                } else if (state.ingredients.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "Mahsulotlar ro'yxati bo'sh",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
                 }
-                return const Text("Error");
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: state.ingredients.length,
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(height: 0);
+                  },
+                  itemBuilder: (context, index) {
+                    return _buildIngredientRow(state.ingredients[index]);
+                  },
+                );
               },
             ),
             const SizedBox(height: 12),
@@ -149,13 +222,37 @@ class _ProductViewState extends State<ProductView> {
               "Tayyorlash jarayoni",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            ...List.generate(
-              products.length,
-              (index) {
-                if (index != products.length) {
-                  return _buildServesRow(index);
+            BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state.statusServes.isInProgress) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.red,
+                      strokeWidth: 4.0,
+                    ),
+                  );
+                } else if (state.serves.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "Tayyorlash jarayonlari ro'yxati bo'sh",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
                 }
-                return const Text("Error");
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: state.serves.length,
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(height: 4);
+                  },
+                  itemBuilder: (context, index) {
+                    return _buildServesRow(state.serves[index], index);
+                  },
+                );
               },
             ),
           ],
@@ -164,29 +261,28 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
-  Widget _buildIngredientRow(int index) {
+  Widget _buildIngredientRow(IngredientModel ingredient) {
     return Row(
       children: [
         const Text(
           "  ·  ",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
         ),
-        Text("Tuxum   4 dona", style: originTextStyle),
+        Text("${ingredient.ingredient}  ${ingredient.quantity}",
+            style: originTextStyle),
       ],
     );
   }
 
-  Widget _buildServesRow(int index) {
+  Widget _buildServesRow(ServesModel serves, int index) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "${index + 1}-jarayon: ${products[index]['name']}",
+          "${index + 1}-jarayon: ${serves.servesName}",
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
-        Text(
-            "An interpunct ·, also known as an interpoint, middle dot, middot, centered dot or centred dot, is a punctuation mark consisting of a vertically centered dot used for interword separation in Classical Latin. (Word-separating spaces did not appear until some time between 600 and 800 CE.)",
-            style: originTextStyle),
+        Text("${serves.servesBody}", style: originTextStyle),
         const SizedBox(height: 14),
       ],
     );

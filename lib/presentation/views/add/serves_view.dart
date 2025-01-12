@@ -5,7 +5,7 @@ import 'package:recipe/presentation/widgets/custom_text_field.dart';
 import 'package:recipe/presentation/widgets/w_button.dart';
 
 class ServesView extends StatefulWidget {
-   final List<Map<String, String>> preparations;
+  final List<Map<String, String>> preparations;
 
   const ServesView({super.key, required this.preparations});
 
@@ -16,7 +16,6 @@ class ServesView extends StatefulWidget {
 class _ServesViewState extends State<ServesView> {
   final TextEditingController controllerProcessName = TextEditingController();
   final TextEditingController controllerProcess = TextEditingController();
-
 
   void _addPreparation() {
     if (controllerProcessName.text.isNotEmpty &&
@@ -41,17 +40,10 @@ class _ServesViewState extends State<ServesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
         title: const Text(
           "Tayyorlash jarayonlari",
-          style: TextStyle(fontSize: 22),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 28,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       bottomNavigationBar: SafeArea(

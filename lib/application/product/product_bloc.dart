@@ -4,7 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:recipe/data/model/g_model/product_model_g.dart';
+import 'package:recipe/data/model/ingredient_model.dart';
 import 'package:recipe/data/model/product_model.dart';
+import 'package:recipe/data/model/serves_model.dart';
 import 'package:recipe/infrasuruktura/apis/favorite_service.dart';
 import 'package:recipe/infrasuruktura/apis/product_service.dart';
 
@@ -167,6 +169,27 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       },
     );
 
+    on<GetFavoriteProductById>(
+      (event, emit) async {
+        emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));
+
+        try {
+          final result =
+              await FavoriteService().fetchFavoriteByProductId(event.productId);
+          emit(
+            state.copyWith(
+              statusFavorite: FormzSubmissionStatus.success,
+              selProduct: result,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
     on<AddFavoriteEvent>(
       (event, emit) async {
         emit(state.copyWith(statusFavorite: FormzSubmissionStatus.inProgress));
@@ -200,6 +223,47 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         } catch (e) {
           emit(
             state.copyWith(statusFavorite: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
+    on<GetProductIngredient>(
+      (event, emit) async {
+        emit(
+            state.copyWith(statusIngredient: FormzSubmissionStatus.inProgress));
+        try {
+          final result =
+              await ProductService().fetchProductIngredient(event.productId);
+          emit(
+            state.copyWith(
+              statusIngredient: FormzSubmissionStatus.success,
+              ingredients: result,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusIngredient: FormzSubmissionStatus.failure),
+          );
+        }
+      },
+    );
+
+    on<GetProductServes>(
+      (event, emit) async {
+        emit(state.copyWith(statusServes: FormzSubmissionStatus.inProgress));
+        try {
+          final result =
+              await ProductService().fetchProductServes(event.productId);
+          emit(
+            state.copyWith(
+              statusServes: FormzSubmissionStatus.success,
+              serves: result,
+            ),
+          );
+        } catch (e) {
+          emit(
+            state.copyWith(statusServes: FormzSubmissionStatus.failure),
           );
         }
       },

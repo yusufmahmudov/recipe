@@ -23,24 +23,8 @@ class _AddCategoryViewState extends State<AddCategoryView> {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
-        backgroundColor: redOrange,
         title: const Text(
           "Kategoriya qo'shish",
-          style: TextStyle(
-            fontSize: 26,
-            color: white,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: white,
-            size: 26,
-          ),
         ),
       ),
       bottomNavigationBar: SafeArea(
