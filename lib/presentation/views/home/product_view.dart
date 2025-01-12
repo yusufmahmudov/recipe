@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:formz/formz.dart';
 import 'package:recipe/assets/colors/colors.dart';
 import 'package:recipe/data/model/ingredient_model.dart';
 import 'package:recipe/data/model/product_model.dart';

@@ -3,8 +3,7 @@ part of 'product_bloc.dart';
 class ProductState extends Equatable {
   final FormzSubmissionStatus statusProduct;
   final FormzSubmissionStatus statusFavorite;
-  final FormzSubmissionStatus statusIngredient;
-  final FormzSubmissionStatus statusServes;
+
   final FormzSubmissionStatus statusIngredient;
   final FormzSubmissionStatus statusServes;
   final List<ProductModel> products;
@@ -18,8 +17,7 @@ class ProductState extends Equatable {
     this.statusFavorite = FormzSubmissionStatus.initial,
     this.statusIngredient = FormzSubmissionStatus.initial,
     this.statusServes = FormzSubmissionStatus.initial,
-    this.statusIngredient = FormzSubmissionStatus.initial,
-    this.statusServes = FormzSubmissionStatus.initial,
+ 
     this.products = const [],
     this.favoriteProducts = const [],
     this.ingredients = const [],
@@ -45,8 +43,7 @@ class ProductState extends Equatable {
     FormzSubmissionStatus? statusFavorite,
     FormzSubmissionStatus? statusIngredient,
     FormzSubmissionStatus? statusServes,
-    FormzSubmissionStatus? statusIngredient,
-    FormzSubmissionStatus? statusServes,
+
     List<ProductModel>? products,
     List<ProductModel>? favoriteProducts,
     List<IngredientModel>? ingredients,
@@ -56,8 +53,6 @@ class ProductState extends Equatable {
     return ProductState(
       statusProduct: statusProduct ?? this.statusProduct,
       statusFavorite: statusFavorite ?? this.statusFavorite,
-      statusIngredient: statusIngredient ?? this.statusIngredient,
-      statusServes: statusServes ?? this.statusServes,
       statusIngredient: statusIngredient ?? this.statusIngredient,
       statusServes: statusServes ?? this.statusServes,
       products: products ?? this.products,
